@@ -295,7 +295,7 @@ func (h *pamModule) handleAuthRequest(mode authd.SessionMode, mTx pam.ModuleTran
 		pamClientType = adapter.InteractiveTerminal
 		tty, cleanup := adapter.GetPamTTY(mTx)
 		// Open the TTY handle to write view to directly
-		ttyOut, err := os.Open("/dev/tty")
+		ttyOut, err := os.OpenFile("/dev/tty", os.O_RDWR, 0644)
 		if err != nil {
 			return fmt.Errorf("%w: can't open /dev/tty: %w", pam.ErrSystem, err)
 		}
