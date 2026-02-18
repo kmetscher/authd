@@ -294,8 +294,13 @@ func (h *pamModule) handleAuthRequest(mode authd.SessionMode, mTx pam.ModuleTran
 	} else if !forceNativeClient && adapter.IsTerminalTTY(mTx) {
 		pamClientType = adapter.InteractiveTerminal
 		tty, cleanup := adapter.GetPamTTY(mTx)
+		// Open the TTY handle to write view to directly
+		ttyOut, err := os.Open("/dev/tty")
+		if err != nil {
+			return fmt.Errorf("%w: can't open /dev/tty: %w", pam.ErrSystem, err)
+		}
 		defer cleanup()
-		teaOpts = append(teaOpts, tea.WithInput(tty))
+		teaOpts = append(teaOpts, tea.WithInput(tty), tea.WithOutput(ttyOut))
 		log.Debug(context.TODO(), "pamClientType = adapter.InteractiveTerminal")
 	} else {
 		pamClientType = adapter.Native
